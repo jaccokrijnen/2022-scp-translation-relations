@@ -225,6 +225,3 @@ with rename_constrs (Γ Δ : ctx) : list constructor -> list constructor -> ctx 
         (Constructor (VarDecl x' τ') n :: cs')
         ((x, x') :: Γ_cs)
   .
-
-
-(* MetaCoq Run (run_print_rules rename). *)

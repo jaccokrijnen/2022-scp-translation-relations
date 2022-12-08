@@ -71,8 +71,3 @@ Definition split_rec t t' :=
   unique t /\
   closed t'
 .
-
-
-Definition outer_binds_dec
-     : Term -> list binding_group * Term.
-Admitted.

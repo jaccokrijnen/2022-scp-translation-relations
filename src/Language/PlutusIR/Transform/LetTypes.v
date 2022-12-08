@@ -8,8 +8,7 @@ Import Coq.Lists.List.ListNotations.
 
 Import NamedTerm.
 
-(* TODO: Combine this with LetNonRec 
-   currently desugares only a let-nonrec with only type bindings
+(* Desugars let-nonrec with only type bindings
 *)
 
 Inductive ty_let : Term -> Term -> Type :=

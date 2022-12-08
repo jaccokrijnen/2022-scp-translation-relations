@@ -48,21 +48,4 @@ Section Congruence.
     | C_Unwrap   : `{ R t t'                -> Cong (Unwrap t)
                                                     (Unwrap t')}
   .
-
-    Definition C_TermBind'     : forall t t' s s' v v' , s = s' -> v = v' -> R t t' -> Cong_Binding
-                                    (TermBind s  v t)
-                                    (TermBind s' v' t').
-    Proof. intros. subst. apply C_TermBind. assumption. Qed.
-
-    Definition C_TypeBind' : forall d d' ty ty',
-      d = d' ->
-      ty = ty' ->
-      Cong_Binding (TypeBind d ty)
-      (TypeBind d' ty').
-    Proof. intros. subst. constructor. Qed.
-
-    Definition C_DatatypeBind' : forall d d', d = d' -> Cong_Binding (DatatypeBind d)
-                                                   (DatatypeBind d').
-    Proof. intros. subst. constructor. Qed.
-
 End Congruence.

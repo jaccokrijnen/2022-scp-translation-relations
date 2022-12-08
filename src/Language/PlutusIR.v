@@ -49,7 +49,7 @@ Inductive DefaultUni : Type :=
     | DefaultUniUnit       (* : DefaultUni unit (* () *)*)
     | DefaultUniBool       (* : DefaultUni bool (* Bool *)*)
     .
-    
+
 (** Existentials as a datype *)
 Inductive some {f : DefaultUni -> Type} :=
   Some : forall {u : DefaultUni}, f u -> some.
@@ -106,176 +106,132 @@ Inductive DefaultFun :=
 
 
 Section AST_term.
-Context (name tyname : Set).
-Context (binderName binderTyname : Set).
+  Context (name tyname : Set).
+  Context (binderName binderTyname : Set).
 
-(** Kinds *)
-Inductive kind :=
-  | Kind_Base : kind
-  | Kind_Arrow : kind -> kind -> kind.
+  (** Kinds *)
+  Inductive kind :=
+    | Kind_Base : kind
+    | Kind_Arrow : kind -> kind -> kind.
 
-(** Types *)
-Inductive ty :=
-  | Ty_Var : tyname -> ty
-  | Ty_Fun : ty -> ty -> ty
-  | Ty_IFix : ty -> ty -> ty
-  | Ty_Forall : binderTyname -> kind -> ty -> ty
-  | Ty_Builtin : @some typeIn -> ty
-  | Ty_Lam : binderTyname -> kind -> ty -> ty
-  | Ty_App : ty -> ty -> ty.
+  (** Types *)
+  Inductive ty :=
+    | Ty_Var : tyname -> ty
+    | Ty_Fun : ty -> ty -> ty
+    | Ty_IFix : ty -> ty -> ty
+    | Ty_Forall : binderTyname -> kind -> ty -> ty
+    | Ty_Builtin : @some typeIn -> ty
+    | Ty_Lam : binderTyname -> kind -> ty -> ty
+    | Ty_App : ty -> ty -> ty.
 
-(*
-  Simplification of attached values in the AST
+  (*
+    Simplification of attached values in the AST
 
-  In the Haskell AST, Term is a functor and each constructor may have a field of the type parameter
-  `a`. Since this seems to be used only for storing intermediate compiler data, it is ignored here.
-  (this works because the dumping code is ignoring it)
-*)
+    In the Haskell AST, Term is a functor and each constructor may have a field of the type parameter
+    `a`. Since this seems to be used only for storing intermediate compiler data, it is ignored here.
+    (this works because the dumping code is ignoring it)
+  *)
 
-(** Declarations *)
-Inductive vdecl := VarDecl : binderName -> ty -> vdecl.
-Inductive tvdecl := TyVarDecl : binderTyname -> kind -> tvdecl.
+  (** Declarations *)
+  Inductive vdecl := VarDecl : binderName -> ty -> vdecl.
+  Inductive tvdecl := TyVarDecl : binderTyname -> kind -> tvdecl.
 
-(* Constructor name and arity, needed for Scott encoding *)
-Inductive constr := Constructor : vdecl -> nat -> constr.
-Inductive dtdecl := Datatype : tvdecl -> list tvdecl -> binderName -> list constr -> dtdecl.
+  (* Constructor name and arity, needed for Scott encoding *)
+  Inductive constr := Constructor : vdecl -> nat -> constr.
+  Inductive dtdecl := Datatype : tvdecl -> list tvdecl -> binderName -> list constr -> dtdecl.
 
-(** Terms and bindings *)
-Inductive term :=
-  | Let      : Recursivity -> list binding -> term -> term
-  | Var      : name -> term
-  | TyAbs    : binderTyname -> kind -> term -> term
-  | LamAbs   : binderName -> ty -> term -> term
-  | Apply    : term -> term -> term
-  | Constant : @some valueOf -> term
-  | Builtin  : DefaultFun -> term
-  | TyInst   : term -> ty -> term
-  | Error    : ty -> term
-  | IWrap    : ty -> ty -> term -> term
-  | Unwrap   : term -> term
+  (** Terms and bindings *)
+  Inductive term :=
+    | Let      : Recursivity -> list binding -> term -> term
+    | Var      : name -> term
+    | TyAbs    : binderTyname -> kind -> term -> term
+    | LamAbs   : binderName -> ty -> term -> term
+    | Apply    : term -> term -> term
+    | Constant : @some valueOf -> term
+    | Builtin  : DefaultFun -> term
+    | TyInst   : term -> ty -> term
+    | Error    : ty -> term
+    | IWrap    : ty -> ty -> term -> term
+    | Unwrap   : term -> term
 
-with binding :=
-  | TermBind : Strictness -> vdecl -> term -> binding
-  | TypeBind : tvdecl -> ty -> binding
-  | DatatypeBind : dtdecl -> binding
-.
-
-Inductive context :=
-  | C_Hole     : context
-
-  | C_LamAbs   : binderName -> ty -> context -> context
-  | C_Apply_L    : context -> term -> context
-  | C_Apply_R    : term -> context -> context
+  with binding :=
+    | TermBind : Strictness -> vdecl -> term -> binding
+    | TypeBind : tvdecl -> ty -> binding
+    | DatatypeBind : dtdecl -> binding
   .
 
-(* Similar to mkLet in Plutus: for an empty list of bindings it is the identity, otherwise
-   it constructs a let with a non-empty list of bindings *)
-Definition mk_let (r : Recursivity) (bs : list binding) (t : term) : term :=
-  match bs with
-    | [] => t
-    | _  => Let r bs t
-  end
+  (* Similar to mkLet in Plutus: for an empty list of bindings it is the identity, otherwise
+     it constructs a let with a non-empty list of bindings *)
+  Definition mk_let (r : Recursivity) (bs : list binding) (t : term) : term :=
+    match bs with
+      | [] => t
+      | _  => Let r bs t
+    end
 .
 
-Fixpoint context_apply (C : context) (t : term) :=
-  match C with
-    | C_Hole           => t
-    | C_LamAbs bn ty C => LamAbs bn ty (context_apply C t)
-    | C_Apply_L C t'   => Apply (context_apply C t) t'
-    | C_Apply_R t' C   => Apply t' (context_apply C t)
-  end
-.
+  (** ** Trace of compilation *)
+  Inductive pass :=
+    | PassRename
+    | PassTypeCheck
+    | PassInline : list name -> pass
+    | PassDeadCode
+    | PassThunkRec
+    | PassFloatTerm
+    | PassLetNonStrict
+    | PassLetTypes
+    | PassLetRec
+    | PassLetNonRec.
 
-(** ** Trace of compilation *)
-Inductive pass :=
-  | PassRename
-  | PassTypeCheck
-  | PassInline : list name -> pass
-  | PassDeadCode
-  | PassThunkRec
-  | PassFloatTerm
-  | PassLetNonStrict
-  | PassLetTypes
-  | PassLetRec
-  | PassLetNonRec.
+  Inductive compilation_trace :=
+    | CompilationTrace : term -> list (pass * term) -> compilation_trace.
 
-Inductive compilation_trace :=
-  | CompilationTrace : term -> list (pass * term) -> compilation_trace.
+  Definition constructorName :=
+    fun c => match c with
+    | Constructor (VarDecl n _) _ => n
+    end
+    .
 
 End AST_term.
 
-Definition constructorName {tyname binderName binderTyname} : constr tyname binderName binderTyname -> binderName :=
-  fun c => match c with
-  | Constructor (VarDecl n _) _ => n
-  end
-  .
+Arguments constructorName {_ _ _} _.
 
 (** * Named terms (all variables and binders are strings) *)
 Module NamedTerm.
 
-(* Perhaps parametrize to mimic original AST in haskell more closely? We really only need one instantiation for now. *)
-(* Context {func : Type} {uni : Type -> Type} {name : Type} {tyname : Type}. *)
+  Notation name := string.
+  Notation tyname := string.
+  Notation binderName := string.
+  Notation binderTyname := string.
 
+  (* These constructors should treat the type parameter
+     as implicit too (this is already correctly generated for the recursive
+     constructors. *)
 
-Definition Unique (n : nat) := tt.
-(*
-Inductive unique := Unique : nat -> unique.
-  Definition unique_dec : forall u u' : unique, {u = u'} + {u <> u'}.
-  Proof. decide equality. apply Nat.eq_dec. Defined.
-*)
+  Arguments Ty_Var [tyname]%type_scope [binderTyname]%type_scope.
+  Arguments Ty_Fun [tyname]%type_scope [binderTyname]%type_scope.
+  Arguments Ty_Forall [tyname]%type_scope [binderTyname]%type_scope.
+  Arguments Ty_Builtin [tyname]%type_scope [binderTyname]%type_scope.
+  Arguments Ty_Lam [tyname]%type_scope [binderTyname]%type_scope.
+  Arguments Var [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
+  Arguments Constant [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
+  Arguments Builtin [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
+  Arguments TyInst [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
+  Arguments Error [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
+  Arguments TypeBind [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
+  Arguments DatatypeBind [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
 
-Definition Name (s : string) (n : unit) := s.
-(*
-Inductive name := Name : string -> unique -> name.
+  Arguments VarDecl [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
+  Arguments TyVarDecl [binderTyname]%type_scope.
+  Arguments Datatype [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
 
-Definition name_dec : forall n1 n2 : name, {n1 = n2} + {n1 <> n2}.
-Proof. decide equality. apply unique_dec. apply string_dec. Defined.
-*)
-
-Definition TyName (s : string) := s.
-(*
-Inductive tyname := TyName : name -> tyname.
-*)
-
-Notation name := string.
-Notation tyname := string.
-Notation binderName := string.
-Notation binderTyname := string.
-
-(* These constructors should treat the type parameter
-   as implicit too (this is already correctly generated for the recursive
-   constructors. *)
-
-Arguments Ty_Var [tyname]%type_scope [binderTyname]%type_scope.
-Arguments Ty_Fun [tyname]%type_scope [binderTyname]%type_scope.
-Arguments Ty_Forall [tyname]%type_scope [binderTyname]%type_scope.
-Arguments Ty_Builtin [tyname]%type_scope [binderTyname]%type_scope.
-Arguments Ty_Lam [tyname]%type_scope [binderTyname]%type_scope.
-Arguments Var [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
-Arguments Constant [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
-Arguments Builtin [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
-Arguments TyInst [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
-Arguments Error [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
-Arguments TypeBind [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
-Arguments DatatypeBind [name]%type_scope [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
-
-Arguments VarDecl [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
-Arguments TyVarDecl [binderTyname]%type_scope.
-Arguments Datatype [tyname]%type_scope [binderName]%type_scope [binderTyname]%type_scope.
-
-Notation Kind := (kind).
-Notation Ty := (ty tyname binderTyname).
-Notation VDecl := (vdecl name tyname binderName).
-Notation TVDecl := (tvdecl binderTyname).
-Notation DTDecl := (dtdecl name tyname binderTyname).
-Notation constructor := (constr tyname binderName binderTyname).
-Notation Term := (term name tyname binderName binderTyname).
-Notation Binding := (binding name tyname binderName binderTyname).
-
-Notation Context := (context name tyname binderName binderTyname).
-
-Arguments C_Hole { _ _ _ _ }.
-
+  Notation Kind := (kind).
+  Notation Ty := (ty tyname binderTyname).
+  Notation VDecl := (vdecl name tyname binderName).
+  Notation TVDecl := (tvdecl binderTyname).
+  Notation DTDecl := (dtdecl name tyname binderTyname).
+  Notation constructor := (constr tyname binderName binderTyname).
+  Notation Term := (term name tyname binderName binderTyname).
+  Notation Binding := (binding name tyname binderName binderTyname).
 
 End NamedTerm.
 
@@ -300,7 +256,7 @@ Section Term_rect.
     (H_Error    : forall t : Ty, P (Error t))
     (H_IWrap    : forall (t t0 : Ty) (t1 : Term), P t1 -> P (IWrap t t0 t1))
     (H_Unwrap   : forall t : Term, P t -> P (Unwrap t)).
-    
+
   Context
     (H_TermBind : forall s v t, P t -> Q (TermBind s v t))
     (H_TypeBind : forall v ty, Q (TypeBind v ty))
@@ -334,7 +290,7 @@ Section Term_rect.
       | DatatypeBind dtd => H_DatatypeBind dtd
     end.
 End Term_rect.
- 
+
 Section Term__ind.
   Import NamedTerm.
 
@@ -355,7 +311,7 @@ Section Term__ind.
     (H_Error    : forall t : Ty, P (Error t))
     (H_IWrap    : forall (t t0 : Ty) (t1 : Term), P t1 -> P (IWrap t t0 t1))
     (H_Unwrap   : forall t : Term, P t -> P (Unwrap t)).
-    
+
   Context
     (H_TermBind : forall s v t, P t -> Q (TermBind s v t))
     (H_TypeBind : forall v ty, Q (TypeBind v ty))
@@ -450,10 +406,6 @@ Section term_rect.
       | DatatypeBind dtd => @H_DatatypeBind dtd
     end.
 End term_rect.
-
-
-
-
 
 
 Declare Custom Entry plutus_term.

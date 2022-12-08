@@ -86,11 +86,3 @@ Inductive beta : Term -> Term -> Prop :=
       Cong beta t1 t2 ->
       beta t1 t2
 .
-
-
-Definition is_beta : Term -> Term -> bool.
-Admitted.
-
-Lemma is_beta_sound : forall t₁ t₂,
-  is_beta t₁ t₂ = true -> beta t₁ t₂.
-Admitted.

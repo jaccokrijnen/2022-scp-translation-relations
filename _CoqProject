@@ -11,16 +11,12 @@ src/Language/PlutusIR/Analysis/BoundVars.v
 src/Language/PlutusIR/Analysis/Purity.v
 src/Language/PlutusIR/Analysis/WellScoped.v
 
-src/Language/PlutusIR/Transform/Universal.v
-src/Language/PlutusIR/Transform/Equal.v
 src/Language/PlutusIR/Transform/ThunkRecursions.v
 src/Language/PlutusIR/Transform/Inline.v
 src/Language/PlutusIR/Transform/Rename.v
 src/Language/PlutusIR/Transform/Congruence.v
-src/Language/PlutusIR/Transform/Functional.v
 src/Language/PlutusIR/Transform/FloatLet.v
 src/Language/PlutusIR/Transform/LetNonStrict.v
-src/Language/PlutusIR/Transform/LetRec.v
 src/Language/PlutusIR/Transform/LetNonRec.v
 src/Language/PlutusIR/Transform/LetTypes.v
 src/Language/PlutusIR/Transform/DeadBindings.v

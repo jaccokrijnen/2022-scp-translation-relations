@@ -203,7 +203,7 @@ Definition bvbs (bs : list binding') : list var := List.concat (map bvb bs).
 
 Fixpoint boundTerms_bindings (bs : list binding') : list (var * term var tyvar var tyvar) := match bs with
     | ((TermBind _ (VarDecl v _) t) :: bs) => (v, t) :: boundTerms_bindings bs
-    | (b                :: bs) =>           boundTerms_bindings bs
+    | (_                :: bs) =>           boundTerms_bindings bs
     | nil               => nil
     end.
 

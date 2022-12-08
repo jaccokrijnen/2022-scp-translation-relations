@@ -31,6 +31,7 @@ Inductive ForallT (A : Type) (P : A -> Type) : list A -> Type :=
                   P x -> ForallT P l -> ForallT P (x :: l).
 Arguments ForallT_nil {_} {_}.
 Arguments ForallT_cons {_} {_} {_} {_}.
+#[global]
 Hint Constructors ForallT : core.
 
 Definition ForallT_uncons {A P} {x : A} {xs} : ForallT P (x :: xs) -> (P x * ForallT P xs) :=
@@ -173,8 +174,6 @@ Definition lookup {a b} (dec : forall x1 x2 : a, {x1 = x2} + {x1 <> x2}) :
     exists r. unfold In in *. tauto.
   }
 Defined.
-
-Eval cbv in lookup Nat.eq_dec 3 [(1, 2); (3, 4)].
 
 (* decision functions that return option instead of sumbool *)
 
