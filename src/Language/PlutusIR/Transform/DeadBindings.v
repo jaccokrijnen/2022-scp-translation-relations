@@ -9,7 +9,6 @@ From PlutusCert Require Import
   Util.List
   Language.PlutusIR
   Language.PlutusIR.Analysis.FreeVars
-  Language.PlutusIR.Analysis.Equality
   Language.PlutusIR.Analysis.Purity
   Language.PlutusIR.Analysis.WellScoped
   Language.PlutusIR.Analysis.UniqueBinders

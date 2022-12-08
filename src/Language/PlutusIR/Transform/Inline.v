@@ -57,9 +57,6 @@ Local Open Scope list_scope.
 
 
 (*
-TODO: split context in two: type scope and term scope
-*)
-(*
 This relation relates terms where inlining of let-bound variables may
 have taken place. Note that the PIR inliner may also remove the let binding
 when all of its occurrences have been inlined (dead code). This is not taken into account here.

@@ -5,6 +5,9 @@ Import ListNotations.
 Local Open Scope list_scope.
 Local Open Scope string_scope.
 
+Inductive ZipWith {a} (P : a -> a -> Type) : list a -> list a -> Type :=
+  | ZipWithCons : forall x y xs ys, P x y -> ZipWith P xs ys -> ZipWith P (x :: xs) (y :: ys)
+  | ZipWithNil  : ZipWith P nil nil.
 
 Fixpoint lookup {X:Type} (k : string) (l : list (string * X)) : option X :=
   match l with

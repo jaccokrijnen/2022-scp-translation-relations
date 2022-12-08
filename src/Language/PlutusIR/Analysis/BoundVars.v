@@ -12,7 +12,6 @@ Local Open Scope string_scope.
 From PlutusCert Require Import
   Util
   Language.PlutusIR
-  Language.PlutusIR.Folds
   .
 
 Import NamedTerm.

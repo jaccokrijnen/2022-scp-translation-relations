@@ -1,7 +1,6 @@
 From PlutusCert Require Import
   PlutusIR
   Analysis.FreeVars
-  Analysis.Equality
   Analysis.UniqueBinders
   Analysis.WellScoped
   Transform.Congruence

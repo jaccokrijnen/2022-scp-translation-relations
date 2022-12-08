@@ -10,7 +10,6 @@ Set Implicit Arguments.
 
 From PlutusCert Require Import
   Language.PlutusIR
-  Language.PlutusIR.Folds
   Analysis.BoundVars
   Util
 .
