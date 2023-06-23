@@ -4,7 +4,6 @@ Require Import Coq.Lists.List.
 Import ListNotations.
 Require Import Ascii.
 Require Import Omega.
-From Equations Require Import Equations.
 
 Set Implicit Arguments.
 

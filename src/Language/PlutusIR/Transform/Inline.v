@@ -3,7 +3,6 @@ Require Import Coq.Lists.List.
 Require Import PeanoNat.
 
 Import ListNotations.
-From Equations Require Import Equations.
 Require Import Program.
 Require Import Lia.
 

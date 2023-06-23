@@ -1,6 +1,5 @@
 Set Implicit Arguments.
 From PlutusCert Require Import Language.PlutusIR.
-From Equations Require Import Equations.
 Require Import Coq.Strings.String.
 Require Import Coq.Lists.List.
 From PlutusCert Require Import Util.List.

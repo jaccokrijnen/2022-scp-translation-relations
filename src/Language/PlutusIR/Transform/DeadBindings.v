@@ -2,8 +2,6 @@ From Coq Require Import
   Strings.String
   Lists.List.
 
-From Equations Require Import Equations.
-
 From PlutusCert Require Import
   Util
   Util.List
@@ -20,7 +18,6 @@ Import UniqueBinders.Term.
 Import ListNotations.
 
 Set Implicit Arguments.
-Set Equations Transparent.
 
 
 Notation fv := (free_vars String.eqb).
