@@ -19,7 +19,7 @@ src/Language/PlutusIR/Transform/FloatLet.v
 src/Language/PlutusIR/Transform/LetNonStrict.v
 src/Language/PlutusIR/Transform/LetNonRec.v
 src/Language/PlutusIR/Transform/LetTypes.v
-src/Language/PlutusIR/Transform/DeadBindings.v
+src/Language/PlutusIR/Transform/DeadCode.v
 src/Language/PlutusIR/Transform/Beta.v
 src/Language/PlutusIR/Transform/Unwrap.v
 src/Language/PlutusIR/Transform/SplitRec.v

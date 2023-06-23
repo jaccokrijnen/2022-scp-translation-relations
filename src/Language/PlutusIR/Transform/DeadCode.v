@@ -1,6 +1,8 @@
 From Coq Require Import
   Strings.String
-  Lists.List.
+  Lists.List
+  Utf8_core
+  .
 
 From PlutusCert Require Import
   Util
@@ -31,6 +33,9 @@ Definition name_Binding (b : Binding) :=
     | DatatypeBind (Datatype (TyVarDecl x _) _ _ _) => x
   end.
 
+Definition name_removed b bs : Prop :=
+  ¬ (In (name_Binding b) (map name_Binding bs)).
+
 Inductive dead_syn : Term -> Term -> Prop :=
   | dc_cong : forall t t',
       Compat dead_syn t t' ->
@@ -53,13 +58,18 @@ with dead_syn_bindings : list Binding -> list Binding -> Prop :=
       bs'n = map name_Binding bs' ->
 
       (* any removed binding is a pure binding *)
-      forall b bn, bn = name_Binding b -> 
-        ((In bn bsn /\ ~In bn bs'n) -> pure_binding [] b) ->
+      (∀ b, In b bs ->
+        name_removed b bs' -> pure_binding [] b
+      ) ->
+
       (* Any resulting binding has a (related) binding in the original group *)
-      forall b' b'n, b'n = name_Binding b' ->
-        (In b'n bs'n -> exists b, forall bn, bn = name_Binding b ->
-           dead_syn_binding b b' /\ In bn bsn) ->
+      (∀ b', In b' bs' ->
+         ∃ b, In b bs /\
+           name_Binding b = name_Binding b' /\
+           dead_syn_binding b b'
+      ) ->
       dead_syn_bindings bs bs'
+
 
 with dead_syn_binding : Binding -> Binding -> Prop :=
 
