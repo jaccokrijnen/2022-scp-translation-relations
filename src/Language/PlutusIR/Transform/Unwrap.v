@@ -1,6 +1,6 @@
 From PlutusCert Require Import
   PlutusIR
-  Transform.Congruence
+  Transform.Compat
 .
 
 Import NamedTerm.
@@ -12,7 +12,7 @@ Inductive unwrap_cancel : Term -> Term -> Prop :=
       unwrap_cancel (Unwrap (IWrap ty1 ty2 t)) t'
 
   | uc_cong : forall t t',
-      Cong unwrap_cancel t t' ->
+      Compat unwrap_cancel t t' ->
       unwrap_cancel t t'
 
   .

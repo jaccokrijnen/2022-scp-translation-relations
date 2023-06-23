@@ -1,6 +1,6 @@
 From PlutusCert Require Import Language.PlutusIR.
 Import NamedTerm.
-From PlutusCert Require Import Language.PlutusIR.Transform.Congruence.
+From PlutusCert Require Import Language.PlutusIR.Transform.Compat.
 From PlutusCert Require Import Language.PlutusIR.Analysis.FreeVars.
 Require Import Coq.Strings.String.
 Require Import Coq.Lists.List.
@@ -16,8 +16,8 @@ Inductive CNR_Term : Term -> Term -> Type :=
       CNR_Term t_body t_body' ->
       CNR_Bindings bs f_bs ->
       CNR_Term (Let NonRec bs t_body) (fold_right apply t_body' f_bs )
-  | CNR_Cong : forall {t t'},
-      Cong CNR_Term t t' ->
+  | CNR_Compat : forall {t t'},
+      Compat CNR_Term t t' ->
       CNR_Term t t'
 
 (*

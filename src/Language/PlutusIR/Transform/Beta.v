@@ -1,7 +1,7 @@
 From PlutusCert Require Import
   PlutusIR
   Util
-  Congruence
+  Compat
   .
 Import NamedTerm.
 
@@ -73,7 +73,7 @@ Inductive beta : Term -> Term -> Prop :=
 
   | beta_multi : forall t bs bs' t_inner t_inner',
       betas t [] bs t_inner ->
-      Cong_Bindings beta bs bs' ->
+      Compat_Bindings beta bs bs' ->
       beta t_inner t_inner' ->
       beta t (mk_let NonRec bs t_inner')
 
@@ -82,7 +82,7 @@ Inductive beta : Term -> Term -> Prop :=
         (TyInst (TyAbs v k t_body) ty)
         (Let NonRec [TypeBind (TyVarDecl v k) ty] t_body)
 
-  | beta_Cong : forall t1 t2,
-      Cong beta t1 t2 ->
+  | beta_Compat : forall t1 t2,
+      Compat beta t1 t2 ->
       beta t1 t2
 .

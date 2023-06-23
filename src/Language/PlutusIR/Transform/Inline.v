@@ -86,7 +86,7 @@ Inductive inline (Γ : ctx) : Term -> Term -> Prop :=
       inline_Ty Γ τ τ' ->
       inline Γ (TyInst (TyAbs α k t) τ) (TyInst (TyAbs α k t') τ')
 
-  (* Congruence cases *)
+  (* Compatibility cases *)
   | inl_TyInst_cong   : forall t t' τ τ',
       inline Γ t t' ->
       inline_Ty Γ τ τ' ->

@@ -14,7 +14,7 @@ src/Language/PlutusIR/Analysis/WellScoped.v
 src/Language/PlutusIR/Transform/ThunkRecursions.v
 src/Language/PlutusIR/Transform/Inline.v
 src/Language/PlutusIR/Transform/Rename.v
-src/Language/PlutusIR/Transform/Congruence.v
+src/Language/PlutusIR/Transform/Compat.v
 src/Language/PlutusIR/Transform/FloatLet.v
 src/Language/PlutusIR/Transform/LetNonStrict.v
 src/Language/PlutusIR/Transform/LetNonRec.v

@@ -3,7 +3,7 @@ From PlutusCert Require Import
   Analysis.FreeVars
   Analysis.UniqueBinders
   Analysis.WellScoped
-  Transform.Congruence
+  Transform.Compat
   .
 Import NamedTerm.
 Import Term.
@@ -62,7 +62,7 @@ Inductive split_syn : Term -> Term -> Prop :=
       split_syn (Let Rec bs t_body) t
 
   | split_rec_cong : forall t t',
-      Cong split_syn t t' ->
+      Compat split_syn t t' ->
       split_syn t t'
 .
 

@@ -3,13 +3,12 @@ Require Import Coq.Lists.List.
 Import Coq.Lists.List.ListNotations.
 From PlutusCert Require Import
   Language.PlutusIR
-  Transform.Congruence
   Analysis.FreeVars
   Analysis.UniqueBinders
   Analysis.Purity
   Analysis.WellScoped
   Transform.SplitRec
-  Transform.Congruence
+  Transform.Compat
   .
 Import NamedTerm.
 
@@ -19,10 +18,10 @@ Notation fv := (free_vars String.eqb).
 Inductive let_merge : Term -> Term -> Prop :=
   | LM_lets : forall t_inner t_inner' t bs bs' min_rec,
       let_merge t_inner t_inner' ->
-      Cong_Bindings let_merge bs bs' ->
+      Compat_Bindings let_merge bs bs' ->
       outer_binds t bs t_inner min_rec ->
       let_merge t (Let min_rec bs' t_inner')
-  | LM_Cong : forall t t', Cong let_merge t t' -> let_merge t t'
+  | LM_Compat : forall t t', Compat let_merge t t' -> let_merge t t'
 .
 
 Section SubList.
@@ -122,13 +121,13 @@ Inductive Bindings_NonRec_Commute : Binding -> Binding -> Type :=
 (* Reorder bindings within a non-recursive binding group*)
 Inductive LetReorder : Term -> Term -> Type :=
   | LR_Let  : forall t t' bs bs' bs'', LetReorder t t' ->
-                 Cong_Bindings LetReorder bs bs' ->
+                 Compat_Bindings LetReorder bs bs' ->
                  SwapsIn Bindings_NonRec_Commute bs' bs'' ->
                  LetReorder
                    (Let NonRec bs   t )
                    (Let NonRec bs'' t')
 
-  | LR_Cong : forall t t', Cong LetReorder t t' -> LetReorder t t'.
+  | LR_Compat : forall t t', Compat LetReorder t t' -> LetReorder t t'.
 
 
 (* This definition assumes global uniqueness *)
@@ -141,7 +140,7 @@ Inductive let_reorder : Term -> Term -> Prop :=
 
   | lr_cong : forall t t',
       ~(exists r bs tb, t = Let r bs tb) ->
-      Cong let_reorder t t' ->
+      Compat let_reorder t t' ->
       let_reorder t t'
 
 with let_reorder_Bindings : list Binding -> list Binding -> Prop :=
@@ -165,7 +164,7 @@ with let_reorder_Binding : Binding -> list Binding -> list Binding -> Prop :=
       let_reorder_Binding b (b' :: bs) (b' :: bs')
 
   | lr_Here : forall b b' bs,
-      Cong_Binding let_reorder b b' ->
+      Compat_Binding let_reorder b b' ->
       let_reorder_Binding b (b' :: bs) bs
   .
 
@@ -176,7 +175,7 @@ Inductive let_float_step : Term -> Term -> Prop :=
   | lfs_LamAbs : forall x τ r bs t,
       (* Note, we don't inductively go in to the bindings,
          this is fine, because we eventually transitively close the relation and
-         it is possible via lfs_Cong *)
+         it is possible via lfs_Compat *)
       Forall (pure_binding []) bs ->
       let_float_step (LamAbs x τ (Let r bs t)) (Let r bs (LamAbs x τ t))
 
@@ -207,10 +206,10 @@ Inductive let_float_step : Term -> Term -> Prop :=
   | lfs_Unwrap : forall r bs t ,
       let_float_step (Unwrap (Let r bs t)) (Let r bs (Unwrap t))
 
-  (* Congruence *)
+  (* Compatruence *)
 
-  | lfs_Cong : forall t t',
-      Cong let_float_step t t' ->
+  | lfs_Compat : forall t t',
+      Compat let_float_step t t' ->
       let_float_step t t'
 
 with let_float_step_Binding : list Binding -> Recursivity -> list Binding -> list Binding -> Prop :=

@@ -6,7 +6,7 @@ From Coq Require Import
 From PlutusCert Require Import
   Language.PlutusIR
   Analysis.BoundVars
-  Transform.Congruence
+  Transform.Compat
   Util.List
   Analysis.Purity
   .
@@ -75,7 +75,7 @@ Inductive thunk_rec (Γ : ctx) : Term -> Term -> Type :=
       strictify Γ Ω bs_new ->
       thunk_rec Γ (Let Rec bs t) (Let Rec bs' (mk_let NonRec bs_new t'))
 
-  (* Congruence cases, `Cong` cannot currently capture
+  (* Compatibility cases, `Compat` cannot currently capture
      this pattern, which has to extend the ctx Γ in all 
      term binders *)
   | tr_Let_NonRec : forall bs bs' t t' Γ_bs,

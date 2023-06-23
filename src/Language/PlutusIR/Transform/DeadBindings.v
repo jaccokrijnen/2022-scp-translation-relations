@@ -10,7 +10,7 @@ From PlutusCert Require Import
   Language.PlutusIR.Analysis.Purity
   Language.PlutusIR.Analysis.WellScoped
   Language.PlutusIR.Analysis.UniqueBinders
-  Language.PlutusIR.Transform.Congruence
+  Language.PlutusIR.Transform.Compat
   .
 
 Import NamedTerm.
@@ -33,7 +33,7 @@ Definition name_Binding (b : Binding) :=
 
 Inductive dead_syn : Term -> Term -> Prop :=
   | dc_cong : forall t t',
-      Cong dead_syn t t' ->
+      Compat dead_syn t t' ->
       dead_syn t t'
 
   | dc_delete_let : forall rec bs t t',

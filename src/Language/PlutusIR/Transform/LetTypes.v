@@ -1,5 +1,5 @@
 From PlutusCert Require Import Language.PlutusIR.
-From PlutusCert Require Import Language.PlutusIR.Transform.Congruence.
+From PlutusCert Require Import Language.PlutusIR.Transform.Compat.
 From PlutusCert Require Import Language.PlutusIR.Analysis.FreeVars.
 Require Import Coq.Strings.String.
 Require Import Coq.Lists.List.
@@ -18,8 +18,8 @@ Inductive ty_let : Term -> Term -> Type :=
       ty_let_Bindings bs f_bs ->
       ty_let (Let NonRec bs t_body) (fold_right apply t_body' f_bs )
 
-  | tl_Cong : forall t t',
-      Cong ty_let t t' ->
+  | tl_Compat : forall t t',
+      Compat ty_let t t' ->
       ty_let t t'
 
 
