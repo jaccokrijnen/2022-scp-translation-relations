@@ -1,15 +1,18 @@
 -Q src PlutusCert
+-Q examples/timelock Timelock
 
 src/Util.v
 src/Util/List.v
 src/Language/PlutusIR.v
 
+src/Language/PlutusIR/Analysis/Value.v
 src/Language/PlutusIR/Analysis/AFI.v
 src/Language/PlutusIR/Analysis/FreeVars.v
 src/Language/PlutusIR/Analysis/UniqueBinders.v
 src/Language/PlutusIR/Analysis/BoundVars.v
 src/Language/PlutusIR/Analysis/Purity.v
 src/Language/PlutusIR/Analysis/WellScoped.v
+src/Language/PlutusIR/Analysis/Equality.v
 
 src/Language/PlutusIR/Transform/ThunkRecursions.v
 src/Language/PlutusIR/Transform/Inline.v
@@ -24,3 +27,9 @@ src/Language/PlutusIR/Transform/Beta.v
 src/Language/PlutusIR/Transform/Unwrap.v
 src/Language/PlutusIR/Transform/SplitRec.v
 
+src/Language/PlutusIR/Transform/DeadCode/Decide.v
+src/Language/PlutusIR/Transform/DeadCode/DecideSound.v
+
+examples/timelock/PreTerm.v
+examples/timelock/PostTerm.v
+examples/timelock/DeadCode.v

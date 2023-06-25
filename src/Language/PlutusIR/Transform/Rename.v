@@ -5,7 +5,6 @@ From Coq Require Import
 From PlutusCert Require Import
   Util
   Util.List
-  Transform.Congruence
   Analysis.FreeVars
   AFI
   .

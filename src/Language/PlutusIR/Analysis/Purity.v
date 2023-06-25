@@ -6,6 +6,7 @@ From Coq Require Import
 From PlutusCert Require Import
   Language.PlutusIR
   Util.List
+  Analysis.Value
   .
 
 Import NamedTerm.
@@ -88,3 +89,16 @@ Inductive pure_binding (Γ : ctx) : Binding -> Prop :=
   | pb_type : forall tvd ty,
       pure_binding Γ (TypeBind tvd ty)
 .
+
+Definition is_pure_binding (Γ : ctx) (b : Binding) : bool :=
+    match b with
+      | TermBind NonStrict vd t => true
+      | TermBind Strict vd t    => is_value t
+      | DatatypeBind dtd        => true
+      | TypeBind tvd ty         => true
+    end
+.
+
+Lemma is_pure_binding_pure_binding : forall Γ b, is_pure_binding Γ b = true -> pure_binding Γ b.
+Admitted.
+
