@@ -14,22 +14,6 @@ From PlutusCert Require Import
 
 Import NamedTerm.
 
-(*
-Inlining considers:
-
-  let nonrec Term bindings
-  let Type bindings
-  type β-redexes of the form (/\α. t) τ
-
-β-redexes on term-level are handled by the Beta pass.
-
-The plutus compiler will _unconditionally_ inline, meaning that it will inline all occurences
-and then remove the remaining dead binding.
-
-We consider the more general case where some occurences may be inlined, but not others. As a consequence,
-this pass does not consider binder elimination.
-
-*)
 
 (* Context of all let-bound term variables in scope *)
 Inductive binder_info :=

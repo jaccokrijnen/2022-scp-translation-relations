@@ -57,14 +57,14 @@ Inductive is_pure (Γ : ctx) : Term -> Type :=
       is_pure Γ (Var x)
 .
 
-Definition is_errorb (t : Term) : bool :=
+Definition dec_is_error (t : Term) : bool :=
   match t with
     | Error _ => true
     | _       => false
   end.
 
-Lemma is_errorb_not_is_error : forall t,
-  is_errorb t = false -> ~ is_error t.
+Lemma dec_is_error_not_is_error : forall t,
+  dec_is_error t = false -> ~ is_error t.
 Proof.
   intros t H.
   destruct t; intros H1; inversion H1.
@@ -90,7 +90,7 @@ Inductive pure_binding (Γ : ctx) : Binding -> Prop :=
       pure_binding Γ (TypeBind tvd ty)
 .
 
-Definition is_pure_binding (Γ : ctx) (b : Binding) : bool :=
+Definition dec_pure_binding (Γ : ctx) (b : Binding) : bool :=
     match b with
       | TermBind NonStrict vd t => true
       | TermBind Strict vd t    => dec_value t
@@ -99,6 +99,6 @@ Definition is_pure_binding (Γ : ctx) (b : Binding) : bool :=
     end
 .
 
-Lemma is_pure_binding_pure_binding : forall Γ b, is_pure_binding Γ b = true -> pure_binding Γ b.
+Lemma sound_dec_pure_binding : forall Γ b, dec_pure_binding Γ b = true -> pure_binding Γ b.
 Admitted.
 

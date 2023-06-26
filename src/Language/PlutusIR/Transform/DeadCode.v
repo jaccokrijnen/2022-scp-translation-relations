@@ -37,23 +37,23 @@ Definition name_removed b bs : Prop :=
   ¬ (In (name_Binding b) (map name_Binding bs)).
 
 Inductive elim : Term -> Term -> Prop :=
-  | dc_cong : forall t t',
+  | elim_cong : forall t t',
       Compat elim t t' ->
       elim t t'
 
-  | dc_delete_let : forall rec bs t t',
+  | elim_delete_let : forall rec bs t t',
       elim t t' ->
       Forall (pure_binding []) bs ->
       elim (Let rec bs t) t'
 
-  | dc_delete_bindings : forall rec bs bs' t t',
+  | elim_delete_bindings : forall rec bs bs' t t',
       elim t t' ->
       elim_bindings bs bs' ->
       elim (Let rec bs t) (Let rec bs' t')
 
 
 with elim_bindings : list Binding -> list Binding -> Prop :=
-  | dc_bindings : forall bs bs' bsn bs'n,
+  | elim_bindings : forall bs bs' bsn bs'n,
       bsn = map name_Binding bs ->
       bs'n = map name_Binding bs' ->
 
@@ -73,11 +73,11 @@ with elim_bindings : list Binding -> list Binding -> Prop :=
 
 with elim_binding : Binding -> Binding -> Prop :=
 
-  | dc_term_bind_cong : forall s vd t t',
+  | elim_term_bind_cong : forall s vd t t',
       elim t t' ->
       elim_binding (TermBind s vd t) (TermBind s vd t')
 
-  | dc_binding : forall b,
+  | elim_binding : forall b,
       elim_binding b b
   .
 

@@ -139,27 +139,6 @@ Lemma dec_value_value : forall t,
   (dec_value t = true -> value t) /\
   (forall n, dec_neutral_value n t = true -> neutral_value n t).
 Proof.
-(*
-  intros t.
-  induction t.
-  all: split.
-  all: try destruct IHt.
-  all: match goal with
-    | H : _ |- dec_value _ = true -> _ => intro H_dec; auto; inversion H_dec
-    | _ => idtac
-  end.
-  - 
-  - 
-  all: auto; inversion H_dec.
-  - clear H0.
-    unfold dec_value in H_dec.
-    unfold dec_value' in H_dec.
-    fold dec_value' in H_dec.
-    repeat (rewrite_eqbs; destruct_ands).
-    apply V_Neutral.
-    apply NV_Apply; auto.
-*)
-
 Admitted.
 
 Lemma dec_neutral_value_neutral_value : forall n t, dec_neutral_value n t = true -> neutral_value n t.

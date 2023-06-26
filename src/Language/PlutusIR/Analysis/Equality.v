@@ -170,7 +170,7 @@ Definition string_eqb_eq := String.eqb_eq.
   Bool.eqb_true_iff
 : reflection.
 Definition andb_and : forall s t, s && t = true -> s = true /\ t = true.
-Proof. auto with reflection. Qed.
+Proof. debug auto with reflection. Qed.
 
 Ltac rewrite_eqbs := repeat (
   match goal with
@@ -400,8 +400,6 @@ Proof. eqb_eq_tac. Defined.
 #[export] Hint Resolve -> Kind_eqb_eq : reflection.
 #[export] Hint Resolve <- Kind_eqb_eq : reflection.
 
-(* TODO: This is not correct yet. Because we have computation in types, we can not merely rely
-  on syntactic equality checking. *)
 Fixpoint Ty_eqb (x y : Ty) : bool := match x, y with
   | Ty_Var X, Ty_Var Y => String.eqb X Y
   | Ty_Fun T1 T2, Ty_Fun T3 T4 => Ty_eqb T1 T3 && Ty_eqb T2 T4
@@ -504,12 +502,6 @@ Proof.
 Qed.
 #[export] Hint Resolve -> DTDecl_eqb_eq : reflection.
 #[export] Hint Resolve <- DTDecl_eqb_eq : reflection.
-
-
-
-
-
-
 
 Fixpoint Term_eqb (x y : Term) {struct x} : bool := match x, y with
   | Let rec bs t, Let rec' bs' t' => Recursivity_eqb rec rec'

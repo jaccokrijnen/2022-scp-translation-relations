@@ -10,28 +10,6 @@ From Coq Require Import
   Strings.String.
 Import ListNotations.
 
-(*
-
-This pass transforms beta redexes into let non-recs, so that the later inlining
-pass has more opportunities for inlining.
-
-Transforms repeated applications (not just repeated β-redexes), e.g.
-
-         $₃
-       /  \
-     $₂    t₃
-   /  \
-  $₁   t₂
-/  \                    =>      let nonrec x = t₁
-λx t₁                                      y = t₂
-|                                          z = t₃
-λy                              in t_body
-|
-λz
-|
-t_body
-
-*)
 
 Inductive lams : Term -> list Term -> list Binding -> Term -> Prop :=
 
@@ -57,17 +35,6 @@ Inductive betas  : Term -> list Term -> list Binding -> Term -> Prop :=
       betas t args bs t_inner
 .
 
-
-Goal forall v1 v2 τ1 τ2 t t1 t2,
-  betas
-    (Apply (Apply (LamAbs v1 τ1 (LamAbs v2 τ2 t)) t1) t2) []
-    [TermBind Strict (VarDecl v1 τ1) t1; TermBind Strict (VarDecl v2 τ2) t2] t.
-intros.
-repeat apply Betas_1.
-apply Betas_2.
-repeat apply Lams_1.
-apply Lams_2.
-Qed.
 
 Inductive beta : Term -> Term -> Prop :=
 

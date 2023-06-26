@@ -40,8 +40,6 @@ Definition t_unit : Term :=
 
 Inductive let_non_strict (Γ : ctx) : Term -> Term -> Type :=
 
-  (* If the decision procedure becomes problematic because of not structurally smaller terms,
-     these two rules should be refactored into a relation similar to rename_Bindings_Rec *)
   | lns_Let_NonRec_nil : forall t t',
       let_non_strict Γ t t' ->
       let_non_strict Γ (Let NonRec [] t) (Let NonRec [] t')

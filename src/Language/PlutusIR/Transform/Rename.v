@@ -104,8 +104,6 @@ Inductive rename (Γ Δ : ctx) : Term -> Term -> Type :=
 
       rename Γ Δ (Let Rec bs t) (Let Rec bs' t')
 
-  (* If the decision procedure becomes problematic because of not structurally smaller terms,
-     these two rules should be refactored into a relation similar to rename_Bindings_Rec *)
   | rn_Let_NonRec_nil : forall t t',
       rename Γ Δ t t' ->
       rename Γ Δ (Let NonRec [] t) (Let NonRec [] t')

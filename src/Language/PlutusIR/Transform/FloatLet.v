@@ -206,7 +206,7 @@ Inductive let_float_step : Term -> Term -> Prop :=
   | lfs_Unwrap : forall r bs t ,
       let_float_step (Unwrap (Let r bs t)) (Let r bs (Unwrap t))
 
-  (* Compatruence *)
+  (* Compatibility *)
 
   | lfs_Compat : forall t t',
       Compat let_float_step t t' ->
