@@ -8,6 +8,7 @@ From Coq Require Import
 From PlutusCert Require Import
   Language.PlutusIR
   Util.List
+  Equality
   .
 
 Import NamedTerm.
@@ -66,23 +67,9 @@ Inductive value : Term -> Prop :=
   | V_Neutral : forall nv,
       neutral_value 0 nv ->
       value nv
-  (** If-Then-Else constructs 
-
-      NOTE (2021-11-4): Removed separate treatment of if-then-else for the sake of simplicity.
-  *)
-  (* | V_If : 
-      value (Builtin IfThenElse)
-  | V_If1 : forall T,
-      value (TyInst (Builtin IfThenElse) T)
-  | V_If2 : forall T cond,
-      value (Apply (TyInst (Builtin IfThenElse) T) cond)
-  | V_If3 : forall T cond t,
-      value (Apply (Apply (TyInst (Builtin IfThenElse) T) cond) t) *)
 
 with neutral_value : nat -> Term -> Prop :=
   | NV_Builtin : forall n f,
-      (* NOTE (2021-11-4): Removed separate treatment of if-then-else for the sake of simplicity. *)
-      (* f <> IfThenElse -> *)
       n < arity f ->
       neutral_value n (Builtin f)
   | NV_Apply : forall n nv v,
@@ -122,36 +109,59 @@ Proof.
 Qed.
 
 Fixpoint
-  is_value' (n : nat) (t : Term) {struct t} :=
+  dec_value' (n : nat) (t : Term) {struct t} :=
   match t with
     | LamAbs x T t0 => true
     | TyAbs X K t   => true
-    | IWrap F T v   => is_value' n v && negb (is_error_b v)
+    | IWrap F T v   => dec_value' n v && negb (is_error_b v)
     | Constant u    => true
     | Error T       => true
 
-
-    (* Duplication for the termination checker *)
+    (* neutral terms *)
     | Builtin f   => ltb n (arity f)
-    | Apply nv v  => is_value' n v && negb (is_error_b v) && is_value' (S n) nv
-    | TyInst nv T => is_value' (S n) nv
+    | Apply nv v  => dec_value' n v && negb (is_error_b v) && dec_value' (S n) nv
+    | TyInst nv T => dec_value' (S n) nv
     | _ => false
   end
   .
 
-Definition is_value := is_value' 0.
+Definition dec_value := dec_value' 0.
 
-Definition is_neutral_value (n : nat) (t : Term) :=
+Definition dec_neutral_value (n : nat) (t : Term) :=
   match t with
-    | Builtin f   => is_value' n t
-    | Apply nv v  => is_value' n t
-    | TyInst nv T => is_value' n t
+    | Builtin f   => dec_value' n t
+    | Apply nv v  => dec_value' n t
+    | TyInst nv T => dec_value' n t
     | _           => false
   end.
 
-Lemma is_value_value : forall t, is_value t = true -> value t.
+Lemma dec_value_value : forall t,
+  (dec_value t = true -> value t) /\
+  (forall n, dec_neutral_value n t = true -> neutral_value n t).
+Proof.
+(*
+  intros t.
+  induction t.
+  all: split.
+  all: try destruct IHt.
+  all: match goal with
+    | H : _ |- dec_value _ = true -> _ => intro H_dec; auto; inversion H_dec
+    | _ => idtac
+  end.
+  - 
+  - 
+  all: auto; inversion H_dec.
+  - clear H0.
+    unfold dec_value in H_dec.
+    unfold dec_value' in H_dec.
+    fold dec_value' in H_dec.
+    repeat (rewrite_eqbs; destruct_ands).
+    apply V_Neutral.
+    apply NV_Apply; auto.
+*)
+
 Admitted.
 
-Lemma is_neutral_value_neutral_value : forall n t, is_neutral_value n t = true -> neutral_value n t.
+Lemma dec_neutral_value_neutral_value : forall n t, dec_neutral_value n t = true -> neutral_value n t.
 Admitted.
 

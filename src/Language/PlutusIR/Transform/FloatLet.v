@@ -237,7 +237,6 @@ Inductive transitive_closure (R : Term -> Term -> Prop) : Term -> Term -> Prop :
 
 Definition let_float t_pre t_post
   := Term.unique t_pre
-  /\ closed t_post
   /\ exists t' t'',
     (  transitive_closure let_float_step t_pre t'
     /\ let_reorder t' t''

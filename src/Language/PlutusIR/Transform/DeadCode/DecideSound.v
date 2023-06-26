@@ -20,8 +20,8 @@ From PlutusCert Require Import
 Import NamedTerm.
 Import ListNotations.
 
-Definition P_Term t := forall t', dec_Term t t' = true -> dead_syn t t'.
-Definition P_Binding b := forall b', dec_Binding dec_Term b b' = true -> dead_syn_binding b b'.
+Definition P_Term t := forall t', dec_elim_Term t t' = true -> elim t t'.
+Definition P_Binding b := forall b', dec_elim_Binding dec_elim_Term b b' = true -> elim_binding b b'.
 
 Ltac split_hypos :=
   match goal with
@@ -59,11 +59,11 @@ Qed.
 
 Lemma H_find_binding' bs bs' :
   (∀ b, In b bs -> P_Binding b) ->
-    forallb (fun b' => find_Binding dec_Term b' bs) bs' = true ->
+    forallb (fun b' => find_Binding dec_elim_Term b' bs) bs' = true ->
     ∀ b', In b' bs' ->
        ∃ x, In x bs /\
          name_Binding x = name_Binding b' /\
-         dead_syn_binding x b'
+         elim_binding x b'
     .
 Proof with eauto with reflection.
   intro H_P_Binding.
@@ -89,7 +89,7 @@ Proof with eauto with reflection.
 
     (* a not related to b' *)
     + apply IHbs in H_find_b' as H_ex. clear IHbs.
-      * destruct H_ex as [x [H_x_In [H_eq_name H_dead_syn]]].
+      * destruct H_ex as [x [H_x_In [H_eq_name H_elim]]].
         assert (In x (b :: bs)). { apply in_cons... }
         exists x...
       * intros b0 H_b0_in.
@@ -103,35 +103,35 @@ Hint Resolve
   H_safely_removed : Hints_bindings.
 #[local]
 Hint Constructors
-  dead_syn_bindings : Hints_bindings.
+  elim_bindings : Hints_bindings.
 #[local]
 Hint Resolve
   H_safely_removed
   H_find_binding' : Hints_bindings.
 #[local]
 Hint Constructors
-  dead_syn
-  dead_syn_binding
-  dead_syn_bindings
+  elim
+  elim_binding
+  elim_bindings
   : reflection.
 
-Lemma dec_Bindings_sound' : ∀ bs bs',
+Lemma sound_dec_elim_Bindings' : ∀ bs bs',
   (∀ b, In b bs -> P_Binding b) ->
-  dec_Bindings dec_Term bs bs' = true -> dead_syn_bindings bs bs'.
+  dec_elim_Bindings dec_elim_Term bs bs' = true -> elim_bindings bs bs'.
 Proof with eauto with Hints_bindings.
   intros H_P_bs bs bs' H.
   simpl in H.
-  unfold dec_Bindings in H.
+  unfold dec_elim_Bindings in H.
   split_hypos.
   eapply dc_bindings...
 Qed.
 
 
-Lemma dec_TermBind_sound : ∀ s v t b b',
+Lemma sound_dec_elim_TermBind : ∀ s v t b b',
   b = TermBind s v t ->
   P_Term t -> 
-  dec_Binding dec_Term b b' = true ->
-  dead_syn_binding b b'.
+  dec_elim_Binding dec_elim_Term b b' = true ->
+  elim_binding b b'.
 Proof with eauto with reflection.
   intros s v t b b' H_eq H_P_Term H_dec.
   unfold P_Term in *.
@@ -145,10 +145,10 @@ Proof with eauto with reflection.
   subst...
 Qed.
 
-Lemma dec_TypeBind_sound : ∀ v ty b b',
+Lemma sound_dec_elim_TypeBind : ∀ v ty b b',
   b = TypeBind v ty ->
-  dec_Binding dec_Term b b' = true ->
-  dead_syn_binding b b'.
+  dec_elim_Binding dec_elim_Term b b' = true ->
+  elim_binding b b'.
 Proof with eauto with reflection.
   intros v ty b b' H_eq H_dec.
   subst.
@@ -160,10 +160,10 @@ Proof with eauto with reflection.
   assert (ty = t0)... subst...
 Qed.
 
-Lemma dec_DatatypeBind_sound : ∀ dtd b b',
+Lemma sound_dec_elim_DatatypeBind : ∀ dtd b b',
   b = DatatypeBind dtd ->
-  dec_Binding dec_Term b b' = true ->
-  dead_syn_binding b b'.
+  dec_elim_Binding dec_elim_Term b b' = true ->
+  elim_binding b b'.
 Proof with eauto with reflection.
   intros dtd b b' H_eq H_dec.
   subst.
@@ -188,17 +188,17 @@ Qed.
 #[local]
 Hint Resolve all_pure : reflection.
 #[local]
-Hint Resolve dec_Bindings_sound' : reflection.
+Hint Resolve sound_dec_elim_Bindings' : reflection.
 #[local]
 Hint Resolve
-  dec_TermBind_sound 
-  dec_TypeBind_sound 
-  dec_DatatypeBind_sound 
+  sound_dec_elim_TermBind 
+  sound_dec_elim_TypeBind 
+  sound_dec_elim_DatatypeBind 
   : reflection.
 #[local]
 Hint Constructors Compat : reflection.
 
-Theorem dec_Term_Binding_sound :
+Theorem sound_dec_elim :
   (∀ t, P_Term t) /\ (∀ b, P_Binding b).
 Proof with eauto with reflection.
   apply Term__multind with (P := P_Term) (Q := P_Binding).
@@ -206,17 +206,17 @@ Proof with eauto with reflection.
 
   (* P_Term (Let rec bs t) *)
   - unfold P_Term in *.
-    intros t' H_dec_Term.
-    simpl in H_dec_Term.
-    destruct t'; simpl in H_dec_Term.
+    intros t' H_dec_elim_Term.
+    simpl in H_dec_elim_Term.
+    destruct t'; simpl in H_dec_elim_Term.
     all: split_hypos.
     {
-      destruct (dec_Bindings dec_Term bs l) eqn:H_dec_bs.
+      destruct (dec_elim_Bindings dec_elim_Term bs l) eqn:H_dec_bs.
       all: split_hypos.
-      (* H_dec_Term: then branch *)
+      (* H_dec_elim_Term: then branch *)
       * split_hypos.
 
-        assert (H_bindings : dead_syn_bindings bs l).
+        assert (H_bindings : elim_bindings bs l).
         {
           apply ForallP_Forall in H.
           rewrite -> Forall_forall in H...
@@ -224,7 +224,7 @@ Proof with eauto with reflection.
         assert (H_eq_rec : rec = r)... subst.
         eapply dc_delete_bindings...
 
-      (* H_dec_Term: else branch *)
+      (* H_dec_elim_Term: else branch *)
       * eapply dc_delete_let...
     }
     all: try eapply dc_delete_let...
@@ -270,12 +270,12 @@ Proof with eauto with reflection.
   - unfold P_Binding...
 Qed.
 
-Corollary dec_Term_sound : ∀ t t', dec_Term t t' = true -> dead_syn t t'.
+Corollary sound_dec_elim_Term : ∀ t t', dec_elim_Term t t' = true -> elim t t'.
 Proof.
-  apply dec_Term_Binding_sound.
+  apply sound_dec_elim.
 Qed.
 
-Corollary dec_Binding_sound : ∀ t t', dec_Term t t' = true -> dead_syn t t'.
+Corollary sound_dec_elim_Binding : ∀ t t', dec_elim_Term t t' = true -> elim t t'.
 Proof.
-  apply dec_Term_Binding_sound.
+  apply sound_dec_elim.
 Qed.

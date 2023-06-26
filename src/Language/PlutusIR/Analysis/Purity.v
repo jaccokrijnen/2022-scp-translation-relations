@@ -93,7 +93,7 @@ Inductive pure_binding (Γ : ctx) : Binding -> Prop :=
 Definition is_pure_binding (Γ : ctx) (b : Binding) : bool :=
     match b with
       | TermBind NonStrict vd t => true
-      | TermBind Strict vd t    => is_value t
+      | TermBind Strict vd t    => dec_value t
       | DatatypeBind dtd        => true
       | TypeBind tvd ty         => true
     end

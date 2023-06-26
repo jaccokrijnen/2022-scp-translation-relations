@@ -3,15 +3,14 @@ From Coq Require Import
 From PlutusCert Require Import
   PlutusIR
   DeadCode
-  DeadCode.Decide.
+  DeadCode.Decide
+  DeadCode.DecideSound.
 From Timelock Require Import
   PreTerm
   PostTerm.
 
-Open Scope string_scope.
 
-(*
-Eval cbv in t_pre.
-Eval cbv in t_post.
-*)
-Eval cbv in dec_Term t_pre t_post.
+Lemma Example2 : elim t_pre t_post.
+Proof.
+  exact (sound_dec_elim_Term t_pre t_post eq_refl).
+Qed.

@@ -344,7 +344,3 @@ Inductive decide {a : Type} (P : a -> Type) (x : a) :=
 
 #[local]
 Hint Constructors decide : core.
-
-Definition dec_all a P (xs : list a) : ForallT (decide P) xs -> decide (ForallT P) xs.
-Proof.
-Admitted.
