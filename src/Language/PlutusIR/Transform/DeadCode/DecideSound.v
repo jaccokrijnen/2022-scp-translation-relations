@@ -123,7 +123,7 @@ Proof with eauto with Hints_bindings.
   simpl in H.
   unfold dec_elim_Bindings in H.
   split_hypos.
-  eapply elim_bindings...
+  eapply elim_bindings_pure...
 Qed.
 
 

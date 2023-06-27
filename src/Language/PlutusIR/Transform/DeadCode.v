@@ -53,7 +53,7 @@ Inductive elim : Term -> Term -> Prop :=
 
 
 with elim_bindings : list Binding -> list Binding -> Prop :=
-  | elim_bindings : forall bs bs' bsn bs'n,
+  | elim_bindings_pure : forall bs bs' bsn bs'n,
       bsn = map name_Binding bs ->
       bs'n = map name_Binding bs' ->
 
@@ -77,7 +77,7 @@ with elim_binding : Binding -> Binding -> Prop :=
       elim t t' ->
       elim_binding (TermBind s vd t) (TermBind s vd t')
 
-  | elim_binding : forall b,
+  | elim_binding_refl : forall b,
       elim_binding b b
   .
 

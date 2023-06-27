@@ -170,7 +170,7 @@ Definition string_eqb_eq := String.eqb_eq.
   Bool.eqb_true_iff
 : reflection.
 Definition andb_and : forall s t, s && t = true -> s = true /\ t = true.
-Proof. debug auto with reflection. Qed.
+Proof. auto with reflection. Qed.
 
 Ltac rewrite_eqbs := repeat (
   match goal with
